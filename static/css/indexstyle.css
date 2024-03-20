@@ -1,0 +1,117 @@
+body {
+    position:relative;
+    width:100%;
+    background-image: url("background.jpg");
+    background-repeat:on;
+    background-position: 0 0;
+    background-size: 330px 330px;
+    overflow:hidden;
+    color:white;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+}
+.header {
+    width:100%;
+    height:50px;
+    position:absolute;
+}
+.contents {
+    width:550px;
+    height:230px;
+    top:100px;
+    left:500px;
+    position: absolute;
+}
+.contents h1 {
+    position:absolute;
+    left:30px;
+    top:0px;
+    word-spacing:2px;
+    padding-left:10px;
+    font-weight: 540;
+}
+.contents p {
+    position:absolute;
+    word-spacing: 3px;
+    font-weight: 520;
+    top:70px;
+    padding-left:30px;
+    white-space:pre-wrap;
+}
+.contents button {
+    position:absolute;
+    bottom:25px;
+    width:40%;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size:20px;
+    height: 45px;
+    left:145px;
+    background-color:#1b1b1b;
+    color:#ffc107;
+    border-radius: 5px;
+    border:1px solid #ffc107;
+    color:white;
+}
+.contents button:hover {
+    cursor: pointer;
+    background-color: #ffc107;
+    color:#1b1b1b;
+}
+.logo {
+    position:absolute;
+    width:150px;
+    height:50px;
+    left:30px;
+}
+.logo h4 {
+    position:absolute;
+    top:-15px;
+    left:60px;
+    font-size: medium;
+    letter-spacing: 2px;
+}
+.logo h5 {
+    position:absolute;
+    font-weight: 500;
+    top:7px;
+    left:60px;
+    letter-spacing: 5px;
+}
+.header ul {
+    width:450px;
+    position:absolute;
+    list-style-type:none;
+    display:flex;
+    top: -16px;
+    right:10px;
+    height: 100%;
+    font-weight:500;
+    font-size: large;
+    padding-left: 20px;
+    padding-right: 0px;
+    font-style:small-caps;
+    align-items:center;
+}
+.header li {
+    color:white;
+    margin-right: 30px;
+    display:inline;
+}
+.header a {
+    text-decoration: none;
+    color:white;
+}
+.header a:hover {
+    color:grey;
+    cursor: pointer;
+}
+.logo #logo {
+    height: 50px;
+    width:50px;
+}
+.contents button a {
+    text-decoration:none;
+    color:white; 
+}
+.contents button a:hover {
+    color:#1b1b1b;
+}

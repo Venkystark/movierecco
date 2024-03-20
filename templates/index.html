@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta author="venkatesh">
+    <meta charset="UTF-8">
+    <meta name="viewport", content="width=devic-width ,initial-scale=1.0">
+    <title>MovieRecco</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/indexstyle.css') }}">
+    </head>
+    <body>
+        <div class="header">
+            <div class="logo">
+                <img id="logo" src="{{ url_for('static', filename='images/logo1.png') }}" src="logo">
+                <h4>MOVIE</h4>
+                <h5>RECCO</h5>
+            </div>
+            <div class="navigation">
+                <ul>
+                    <li><a>Home</a></li>
+                    <li><a href="{{ url_for('trending1') }}">Recently Trending</a></li>
+                    <li><a>About</a></li>
+                    <li><a>Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="contents">
+                <h1>Looking for the perfect film?</h1>
+                <p>Take a quick journey to be matched with a movie based on 
+                        your preferences.</p>
+                <button><a href="{{ url_for('login1') }}">Start</a></button>
+        </div>
+    </body>
+</html>

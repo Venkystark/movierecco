@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommendations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      width: 200px;
+      height: 350px; /* Set a fixed height for proper alignment */
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .card img {
+      flex-grow: 1; /* Allow the image to expand within the card */
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Recommendations</h1>
+  <div class="container" id="movieContainer"></div>
+
+  <script>
+    // Your API key and movie IDs
+    const apiKey = '211288f73144365d5646dbf944e2c255';
+    const movieIds = JSON.parse('{{ recommended_movies | tojson | safe }}'); // Example movie IDs
+
+    // Function to fetch movie details by ID
+    async function getMovieDetails(movieId) {
+      const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`);
+      const data = await response.json();
+      return data;
+    }
+
+    // Function to recommend movies that best match the same genre and language
+    async function recommendMoviesForArray(movieIds) {
+      const recommendedMovies = [];
+
+      for (const movieId of movieIds) {
+        const movieDetails = await getMovieDetails(movieId);
+        const genreId = findMostCommonElement(movieDetails.genres.map((genre) => genre.id));
+        const language = movieDetails.original_language;
+
+        // Fetch a list of movies with the same genre and language
+        const recommendResponse = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}&with_original_language=${language}`);
+        const recommendData = await recommendResponse.json();
+
+        // Sort recommended movies by popularity or any other criteria
+        const sortedMovies = recommendData.results.sort((a, b) => b.popularity - a.popularity);
+
+        // Select the top recommended movie (or multiple) based on your criteria
+        const topRecommendations = sortedMovies.slice(0, 3); // Recommend the top 3 movies
+
+        recommendedMovies.push(...topRecommendations);
+      }
+
+      return recommendedMovies;
+    }
+
+    // Function to find the most common element in an array
+    function findMostCommonElement(arr) {
+      const counts = {};
+      let mostCommonElement = arr[0];
+      let maxCount = 0;
+
+      arr.forEach((element) => {
+        counts[element] = (counts[element] || 0) + 1;
+        if (counts[element] > maxCount) {
+          maxCount = counts[element];
+          mostCommonElement = element;
+        }
+      });
+
+      return mostCommonElement;
+    }
+
+    // Function to create a movie card
+    function createMovieCard(movie) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>${movie.title}</h2>
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title} poster">
+      `;
+      return card;
+    }
+
+    // Display recommended movies
+    recommendMoviesForArray(movieIds)
+      .then((recommendedMovies) => {
+        const movieContainer = document.getElementById('movieContainer');
+        recommendedMovies.forEach((movie) => {
+          const card = createMovieCard(movie);
+          movieContainer.appendChild(card);
+        });
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+</html>

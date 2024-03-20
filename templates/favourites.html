@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Movies</title>
+    <!-- Add your CSS styles here if needed -->
+    <style>
+        body {
+            z-index:0;
+            position:relative;
+            width:100%;
+            background-image: url("{{ url_for('static', filename='css/background.jpg') }}");
+            background-repeat:on;
+            background-position: 0 0;
+            background-size: 330px 330px;
+            overflow:auto;
+            color:white;
+            font-family:Georgia, 'Times New Roman', Times, serif;
+        }
+        .header {
+            width:100%;
+            height:70px;
+            position:fixed;
+            background-color: #1b1b1b;
+            top:0px;
+        }
+        .logo {
+            position:absolute;
+            width:150px;
+            height:50px;
+            left:36px;
+            top:13px;
+        }
+        .logo h4 {
+            position:absolute;
+            top:-12px;
+            left:63px;
+            font-size: medium;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        .logo h5 {
+            position:absolute;
+            font-weight: 500;
+            font-size: small;
+            top:7px;
+            left:63px;
+            letter-spacing: 5px;
+        }
+        .navigation {
+          border:red 1px solid;
+          position:absolute;
+          height:max-content;
+          width:max-content;
+          top:10px;
+          right:15px;
+        }
+        .header .navigation ul {
+            width:max-content;
+            position:absolute;
+            list-style-type:none;
+            display:flex;
+            top: 5px;
+            right:16px;
+            height: 100%;
+            font-weight:500;
+            font-size: large;
+            padding-left: 30px;
+            padding-right: 0px;
+            font-style:small-caps;
+            align-items:center;
+        }
+        .header .navigation ul li {
+            color:white;
+            margin-right: 30px;
+            display:inline;
+        }
+        .header .navigation ul a {
+            text-decoration: none;
+            color:white;
+        }
+        .header .navigation ul a:hover {
+            color:grey;
+            cursor: pointer;
+        }
+        .logo #logo {
+            position:absolute;
+            top:-1px;
+            left:3px;
+            height: 50px;
+            width:50px;
+        }
+        .card {
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            width: 300px;
+            text-align: center;
+            height:max-content;
+            background-color: #1b1b1b;
+        }
+        .card img {
+            max-width:60%;
+        }
+        #search-container {
+            text-align: center;
+            margin: 20px;
+            top:2px;
+            left:260px;
+            position:absolute;
+            width:max-content;
+            height:max-content;
+        }
+        #search-input {
+            padding: 5px;
+            width: 400px;
+            height:20px;
+            border-radius:100px;
+            position:absolute;
+            border:none;
+        }
+        #search-container button {
+            border:none;
+            border-radius:100px;
+            position:absolute;
+            height:30px;
+            left:356px;
+            width:90px;
+            z-index:4;
+            font-weight:bold;
+            background-color:#ffc107;
+            color:#1b1b1b;
+        }
+        #search-container button:hover {
+            cursor:pointer;
+        }
+        #load-more {
+            display: block;
+            margin: 20px auto;
+        }
+        #movie-container {
+            position:absolute;
+            z-index:-1;
+            top:80px;
+            height:fit-content;
+        }
+        ul input {
+            height:30px;
+            width:80px;
+            background-color:#ffc107;
+            border-radius:100px;
+            color:#1b1b1b;
+            font-weight:bold;
+        }
+        #load-more {
+            position:absolute;
+            z-index:8;
+            bottom:-55px;
+            height:30px;
+            width:200px;
+            background-color:#ffc107;
+            color:#1b1b1b;
+            left:43%;
+            margin-top:50px;
+            border-radius:100px;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <img id="logo" src="{{ url_for('static', filename='images/logo1.png') }}" src="logo">
+            <h4>MOVIE</h4>
+            <h5>RECCO</h5>
+        </div>
+        <div class="navigation">
+            <ul>
+                <li><a href="{{url_for('trending')}}">Home</a></li>
+                <li><a href="{{url_for('favourites')}}">Favorites</a></li>
+                <li><a href="{{ url_for('recco1') }}">Recommendations</a></li>
+                <!--<li>{{ username }}</a><li>-->
+                    <form method="post" action="/logout"><input type="submit" value="logout"></form>
+            </ul>
+        </div>
+    <div id="movie-container">
+        <!-- Favorite movies will be displayed here as cards -->
+    </div>
+    <script>
+        const apiKey = '211288f73144365d5646dbf944e2c255'; // Replace with your TMDb API key
+
+        const favoriteMovies = JSON.parse('{{ favorite_movies | tojson | safe }}');
+
+        async function fetchAndDisplayFavoriteMovies() {
+            const movieContainer = document.getElementById('movie-container');
+
+            for (const movieId of favoriteMovies) {
+                try {
+                    const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`);
+                    const movie = await response.json();
+
+                    if (response.ok) {
+                        // Create a card for each favorite movie
+                        const card = document.createElement('div');
+                card.classList.add('card');
+
+                const image = document.createElement('img');
+                image.src = `https://image.tmdb.org/t/p/w300${movie.poster_path}`;
+                image.alt = `${movie.title} Poster`;
+
+                const cardContent = document.createElement('div');
+                cardContent.innerHTML = `
+                <h3>${movie.title}</h2>
+                    <p>Rating: ${movie.vote_average}</p>
+                    <p>Release Date: ${movie.release_date}</p>
+                    <button id="favorite-button-${movie.id}" 
+                        data-is-favorite="true" 
+                        onclick="addToFavorites('${movie.id}')"
+                        style="background-color: #ffc107; color: black; border:none; padding: 5px 10px; cursor: pointer; font-weight:bold; border-radius:100px;">
+                        Remove from Favorites
+                    </button>
+                `;
+
+                card.appendChild(image);
+                card.appendChild(cardContent);
+                movieContainer.appendChild(card);
+                    } else {
+                        console.error('Error:', movieData.status_message || response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        }
+        async function addToFavorites(movieId) {
+    const apiUrl = 'http://127.0.0.1:5000/api/add-to-favorites'; // Replace with your backend endpoint
+    const favoriteButton = document.getElementById(`favorite-button-${movieId}`);
+   // const isFavorite = favoriteButton.getAttribute('data-is-favorite') === 'true';
+    const action = 'remove'; // Toggle between 'add' and 'remove'
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ movieId, action }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.message) {
+                if (action === 'remove') {
+                    favoriteButton.setAttribute('data-is-favorite', 'false');
+                    alert('Movie removed from favorites!');
+                     // Remove the card element from the DOM
+                     const card = favoriteButton.closest('.card');
+                        card.parentNode.removeChild(card);
+                }
+            } else {
+                console.error('Error:', data.error || 'Unknown error');
+            }
+        } else {
+            console.error('Error:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+        // Call the function to fetch and display favorite movies when the page loads
+        fetchAndDisplayFavoriteMovies();
+    </script>
+</body>
+</html>

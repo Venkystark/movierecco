@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Cards</title>
+    <style>
+        /* Your existing CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 15px;
+            text-align: center;
+            width: 200px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Movie Cards</h1>
+    
+    <!-- Search bar input field -->
+    <input type="text" id="search-input" placeholder="Search by title or genre">
+
+    <div class="card-container">
+        {% for movie in movies %}
+        <div class="card">
+            <img src="{{ movie['Poster_Link'] }}" alt="{{ movie['Series_Title'] }}">
+            <h2>{{ movie['Series_Title'] }}</h2>
+            <p>Genre: {{ movie['Genre'] }}</p>
+            <p>Rating: {{ movie['IMDB_Rating'] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // JavaScript code for search and filtering functionality
+        const searchInput = document.getElementById('search-input');
+        const cards = document.querySelectorAll('.card');
+
+        // Add an event listener to the search input
+        searchInput.addEventListener('input', filterMovies);
+
+        function filterMovies() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            // Loop through all movie cards
+            cards.forEach(card => {
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                const genre = card.querySelector('p:nth-child(3)').textContent.toLowerCase();
+
+                // Check if the title or genre matches the search term
+                if (title.includes(searchTerm) || genre.includes(searchTerm)) {
+                    card.style.display = 'block'; // Show the card
+                } else {
+                    card.style.display = 'none'; // Hide the card
+                }
+            });
+        }
+    </script>
+</body>
+</html>

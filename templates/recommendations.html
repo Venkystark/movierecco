@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Similar Movies</title>
+    <style>
+        /* Add some basic CSS styling */
+        .movie-card {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            width: 300px;
+            display: inline-block;
+        }
+        .movie-poster {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Similar Movies</h1>
+    
+    <div id="movie-container"></div>
+    
+    <script>
+        const apiKey = '211288f73144365d5646dbf944e2c255';  // Replace with your TMDb API key
+        const movieIds = JSON.parse('{{ recommended_movies | tojson | safe }}');  // Replace with your own movie IDs
+        const genreIds = [];
+        const movieContainer = document.getElementById('movie-container');
+
+        // Function to fetch similar movie data for a given movie ID
+        async function fetchSimilarMovies(movieId) {
+            const genreIdString = genreIds.join(',');
+            const movieIdString = movieIds.join(',');
+          const response = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreIdString}&sort_by=vote_average.desc&page=1`);
+            //const response=await fetch('https://api.themoviedb.org/3/movie/123/similar?api_key=${apiKey}')
+            const data = await response.json();
+            return data.results;
+        }
+        
+async function fetchMovieGenres(movieId) {
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`;
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const movieData = await response.json();
+            genreIds.push(...movieData.genres.map(genre => genre.id));
+        }
+    } catch (error) {
+        console.error(`Error fetching genre for movie ID ${movieId}: ${error}`);
+    }
+}
+
+async function fetchGenreIds() {
+    for (const movieId of movieIds) {
+        await fetchMovieGenres(movieId);
+    }
+    console.log('Genre IDs:', genreIds);
+}
+
+
+        // Function to display movies on the web page
+        async function displaySimilarMovies() {
+            for (const movieId of movieIds) {
+                const similarMovies = await fetchSimilarMovies(movieId);
+                similarMovies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'movie-card';
+                    const movieTitle = document.createElement('h2');
+                    movieTitle.textContent = movie.title;
+                    const moviePoster = document.createElement('img');
+                    moviePoster.className = 'movie-poster';
+                    moviePoster.src = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+                    movieCard.appendChild(movieTitle);
+                    movieCard.appendChild(moviePoster);
+                    movieContainer.appendChild(movieCard);
+                });
+            }
+        }
+
+        displaySimilarMovies();
+        fetchGenreIds();
+    </script>
+</body>
+</html>

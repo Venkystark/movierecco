@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommendations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      justify-content: space-evenly;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 350px;
+    }
+    .card h2 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .card img {
+      flex-grow: 1;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Recommendations</h1>
+  <div class="container" id="movieContainer"></div>
+
+  <script>
+    // Your API key and movie IDs
+    const apiKey = '211288f73144365d5646dbf944e2c255';
+    const movieIds = JSON.parse('{{ recommended_movies | tojson | safe }}'); // Example movie IDs
+
+    // Function to fetch movie details by ID
+    async function getMovieDetails(movieId) {
+      const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`);
+      const data = await response.json();
+      return data;
+    }
+
+    // Function to recommend 3 random movies in the same genre and language
+    async function recommendRandomMoviesForArray(movieIds) {
+      const recommendedMovies = [];
+
+      for (const movieId of movieIds) {
+        const movieDetails = await getMovieDetails(movieId);
+
+        const genreId = movieDetails.genres[0].id;
+        const language = movieDetails.original_language;
+
+        // Fetch a list of movies with the same genre and language
+        const recommendResponse = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}&with_original_language=${language}`);
+        const recommendData = await recommendResponse.json();
+
+        // Exclude the current movie and any previously recommended movies from the recommendations
+        const filteredRecommendations = recommendData.results.filter((movie) => movie.id !== movieId && !recommendedMovies.some((recMovie) => recMovie.id === movie.id));
+
+        // Select 3 random movies from the recommendations
+        const randomRecommendations = selectRandomMovies(filteredRecommendations, 3);
+
+        recommendedMovies.push(...randomRecommendations);
+      }
+
+      return recommendedMovies;
+    }
+
+    // Function to select random movies from an array
+    function selectRandomMovies(array, count) {
+      const randomMovies = [];
+      const arrayCopy = [...array];
+      for (let i = 0; i < count; i++) {
+        if (arrayCopy.length === 0) break;
+        const randomIndex = Math.floor(Math.random() * arrayCopy.length);
+        randomMovies.push(arrayCopy.splice(randomIndex, 1)[0]);
+      }
+      return randomMovies;
+    }
+
+    // Function to create a movie card
+    function createMovieCard(movie) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>${movie.title}</h2>
+        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title} poster">
+      `;
+      return card;
+    }
+
+    // Display recommended movies
+    recommendRandomMoviesForArray(movieIds)
+      .then((recommendedMovies) => {
+        const movieContainer = document.getElementById('movieContainer');
+        recommendedMovies.forEach((movie) => {
+          const card = createMovieCard(movie);
+          movieContainer.appendChild(card);
+        });
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  </script>
+</body>
+</html>
