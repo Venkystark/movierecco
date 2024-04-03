@@ -13,7 +13,7 @@ app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'your_secret_key'  # Replace with a secure secret key
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
-db = client['userdb']
+db = client['userdb']    
 users_collection = db['users']
 api_key= '211288f73144365d5646dbf944e2c255'
 
