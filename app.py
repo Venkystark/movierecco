@@ -5,9 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import requests
 #from collections import Counter
-from sklearn.metrics.pairwise import cosine_similarity
+#from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+#from sklearn.feature_extraction.text import TfidfVectorizer
 
 app = Flask(__name__,static_url_path='/static')
 app.secret_key = 'your_secret_key'  # Replace with a secure secret key
@@ -58,7 +58,7 @@ def login1():
         elif request.form.get('form_id')=='form2':
              username = request.form['logemail1']
              password = request.form['logpass1']
-             hashed_password = generate_password_hash(password, method='sha256')
+             hashed_password = generate_password_hash(password)
         
         # Check if the username already exists
              if db.users.find_one({'username': username}):
